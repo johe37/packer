@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Globals
+PACKAGES=(
+  qemu-system
+  ansible
+)
+
+install_packer_redhat() {
+  echo "Installing Packer on RedHat-based system..."
+
+  sudo dnf install -y dnf-plugins-core
+
+  # Get major version (e.g., 9 from 9.3)
+  releasever=$(rpm -E %fedora || grep -oE '^[0-9]+' /etc/redhat-release)
+
+  sudo dnf config-manager --add-repo "https://rpm.releases.hashicorp.com/fedora/${releasever}/x86_64/stable.repo"
+  sudo dnf install -y packer
+}
+
+install_packer_debian() {
+  echo "Installing Packer on Debian-based system..."
+
+  . /etc/os-release
+  codename=$(lsb_release -cs 2>/dev/null || echo "$VERSION_CODENAME")
+
+  sudo apt-get update
+  sudo apt-get install -y gpg curl gnupg lsb-release software-properties-common
+
+  curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+  echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com ${codename} main" | \
+    sudo tee /etc/apt/sources.list.d/hashicorp.list > /dev/null
+
+  sudo apt-get update
+  sudo apt-get install -y packer
+}
+
+install_packages(){
+  local pkg_mgr="$1"
+  for pkg in "${PACKAGES[@]}"; do
+    sudo $pkg_mgr install -y $pkg
+  done
+}
+
+main() {
+  # Install dependencies
+  if [ -f /etc/redhat-release ]; then
+    install_packages "dnf"
+    install_packer_redhat
+  elif [ -f /etc/debian_version ]; then
+    install_packages "apt"
+    install_packer_debian
+  else
+    echo "Unsupported OS"
+    exit 1
+  fi
+
+  # Setup temporary ssh key
+  if [ ! -f ~/.ssh/lab ]; then
+    ssh-keygen -t ed25519 -f ~/.ssh/lab
+  fi
+}
+
+main "$@"
+
