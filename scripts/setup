@@ -47,9 +47,11 @@ install_packages(){
 main() {
   # Install dependencies
   if [ -f /etc/redhat-release ]; then
+    sudo dnf update -y
     install_packages "dnf"
     install_packer_redhat
   elif [ -f /etc/debian_version ]; then
+    sudo apt update
     install_packages "apt"
     install_packer_debian
   else
