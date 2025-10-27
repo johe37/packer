@@ -46,14 +46,20 @@ install_packages(){
 
 main() {
   # Install dependencies
-  if [ -f /etc/redhat-release ]; then
+  if [ -f /etc/fedora-release ]; then
     sudo dnf update -y
-    install_packages "dnf"
-    install_packer_redhat
+    sudo dnf install -y qemu ansible
+    sudo dnf install -y dnf-plugins-core
+    sudo dnf config-manager addrepo --from-repofile=https://rpm.releases.hashicorp.com/fedora/hashicorp.repo
+    sudo dnf -y install packer
   elif [ -f /etc/debian_version ]; then
     sudo apt update
     install_packages "apt"
     install_packer_debian
+  elif [ -f /etc/redhat-release ]; then
+    sudo dnf update -y
+    install_packages "dnf"
+    install_packer_redhat
   else
     echo "Unsupported OS"
     exit 1

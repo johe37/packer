@@ -5,14 +5,6 @@ AlmaLinux, Debian, Ubuntu etc.
 
 ## Get started
 
-Before continuing, make sure that your user belongs to the kvm group.
-
-```shell
-sudo usermod -aG kvm $USER
-```
-
-Or, run packer with sudo (not recommended).
-
 ### Dependencies
 
 ```shell
@@ -22,6 +14,14 @@ cd packer
 chmod +x scripts/setup
 ./scripts/setup
 ```
+
+Before continuing, make sure that your user belongs to the kvm group.
+
+```shell
+sudo usermod -aG kvm $USER
+```
+
+Or, run packer with sudo (not recommended).
 
 ### Build
 
