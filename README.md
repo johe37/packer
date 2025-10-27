@@ -33,3 +33,9 @@ packer build .
 # Build specific
 packer build -only=qemu.debian12 .
 ```
+
+### Setup noVNC example
+
+```shell
+sudo novnc_proxy --vnc localhost:5900 --listen 6080
+```
