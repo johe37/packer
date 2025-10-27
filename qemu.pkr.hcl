@@ -48,8 +48,8 @@ source "qemu" "almalinux9" {
 
 # Debian12
 source "qemu" "debian12" {
-  iso_url        = "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.11.0-amd64-netinst.iso"
-  iso_checksum   = "sha512:0921d8b297c63ac458d8a06f87cd4c353f751eb5fe30fd0d839ca09c0833d1d9934b02ee14bbd0c0ec4f8917dde793957801ae1af3c8122cdf28dde8f3c3e0da"
+  iso_url        = "https://cdimage.debian.org/cdimage/archive/12.12.0/amd64/iso-cd/debian-12.12.0-amd64-netinst.iso"
+  iso_checksum   = "sha512:c93055182057dd19a334260671c7e10880541b7721ad9c8df87be47e0a11d5bbf85018350ff224ff6a5f6a68320b07e95d539cef9dc020c93966bfaa86d4b2ce"
   vm_name        = "packer-debian12.qcow2"
   http_directory = "http"
   boot_wait      = "10s"
@@ -80,7 +80,7 @@ source "qemu" "debian12" {
 
 # Ubuntu24
 source "qemu" "ubuntu24" {
-  iso_url        = "https://releases.ubuntu.com/noble/ubuntu-24.04.2-live-server-amd64.iso"
+  iso_url        = "https://old-releases.ubuntu.com/releases/24.04.2/ubuntu-24.04.2-live-server-amd64.iso"
   iso_checksum   = "md5:d0013676be5d53a9a160abd3ca1f762f"
   vm_name        = "packer-ubuntu24.qcow2"
   http_directory = "http"
