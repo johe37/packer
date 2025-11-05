@@ -1,7 +1,8 @@
 source "qemu" "almalinux9" {
+  output_directory = var.output_dir
+  vm_name        = "almalinux9-base-image.qcow2"
   iso_url        = "https://raw.repo.almalinux.org/almalinux/9/isos/x86_64/AlmaLinux-9.6-x86_64-boot.iso"
   iso_checksum   = "sha256:113521ec7f28aa4ab71ba4e5896719da69a0cc46cf341c4ebbd215877214f661"
-  vm_name        = "packer-almalinux9.qcow2"
   http_directory = "http"
   boot_wait      = "10s"
   boot_command = [
@@ -38,7 +39,7 @@ build {
 
   provisioner "ansible" {
     playbook_file    = "files/provision-image-rhel.yml"
-    ansible_env_vars = local.ansible_env_vars
+    ansible_env_vars = var.ansible_env_vars
   }
 }
 

@@ -12,47 +12,16 @@ packer {
   }
 }
 
-# Shared Ansible provisioner (you can customize per build if needed)
-locals {
-  ansible_env_vars = [
+variable "ansible_env_vars" {
+  type = list(string)
+  default = [
     "ANSIBLE_SSH_ARGS='-o IdentitiesOnly=yes'",
     "ANSIBLE_PIPELINING=True",
     "ANSIBLE_REMOTE_TEMP=/tmp",
   ]
 }
 
-# AlmaLinux9 build block
-build {
-  sources = [
-    "qemu.almalinux9",
-  ]
-
-  provisioner "ansible" {
-    playbook_file    = "files/provision-image-rhel.yml"
-    ansible_env_vars = local.ansible_env_vars
-  }
-}
-
-# Debian12 build block
-build {
-  sources = [
-    "qemu.debian12",
-  ]
-
-  provisioner "ansible" {
-    playbook_file    = "files/provision-image-debian.yml"
-    ansible_env_vars = local.ansible_env_vars
-  }
-}
-
-# Ubuntu24 build block
-build {
-  sources = [
-    "qemu.ubuntu24",
-  ]
-
-  provisioner "ansible" {
-    playbook_file    = "files/provision-image-debian.yml"
-    ansible_env_vars = local.ansible_env_vars
-  }
+variable "output_dir" {
+  type    = string
+  default = "output"
 }
