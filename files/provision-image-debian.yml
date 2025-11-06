@@ -112,7 +112,6 @@
         path: "{{ item }}"
         state: absent
       loop:
-        - /var/log/anaconda
         - /var/log/qemu-ga
         - /var/log/tuned
         - /var/lib/cloud
