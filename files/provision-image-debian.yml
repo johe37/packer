@@ -21,7 +21,6 @@
       ansible.builtin.package:
         name:
           - cloud-init
-          - dracut-config-generic
           - gdisk
           - qemu-guest-agent
           - rsync
@@ -47,9 +46,32 @@
         cmd: cloud-init clean
       changed_when: true
 
-    - name: Regenerate the initramfs
+    - name: Force classic ethX network interface naming
+      block:
+        - name: Disable predictable network interface names
+          ansible.builtin.lineinfile:
+            path: /etc/default/grub
+            regexp: '^(GRUB_CMDLINE_LINUX=.*)'
+            line: 'GRUB_CMDLINE_LINUX="net.ifnames=0 biosdevname=0"'
+            backrefs: yes
+
+        - name: Update GRUB configuration
+          ansible.builtin.command: >
+            {{ 'grub2-mkconfig -o /boot/grub2/grub.cfg'
+               if ansible_facts['os_family'] == 'RedHat'
+               else 'update-grub' }}
+          changed_when: true
+
+        - name: Create udev rule to rename interfaces (fallback)
+          ansible.builtin.copy:
+            dest: /etc/udev/rules.d/80-net-setup-link.rules
+            content: |
+              # Disable predictable interface names
+              SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", NAME="eth%n"
+
+    - name: Regenerate the initramfs (Debian/Ubuntu)
       ansible.builtin.command:
-        cmd: dracut -f --regenerate-all
+        cmd: update-initramfs -u
       changed_when: true
 
     - name: Disable root login
