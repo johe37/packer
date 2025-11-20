@@ -38,7 +38,7 @@ build {
   ]
 
   provisioner "ansible" {
-    playbook_file    = "files/provision-image-rhel.yml"
+    playbook_file    = "./ansible/provision-image-rhel.yml"
     ansible_env_vars = var.ansible_env_vars
   }
 }

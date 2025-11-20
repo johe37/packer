@@ -36,7 +36,7 @@ build {
   ]
 
   provisioner "ansible" {
-    playbook_file    = "files/provision-image-debian.yml"
+    playbook_file    = "./ansible/provision-image-debian.yml"
     ansible_env_vars = var.ansible_env_vars
   }
 }
