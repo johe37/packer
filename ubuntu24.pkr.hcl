@@ -1,6 +1,6 @@
 source "qemu" "ubuntu24" {
   output_directory = var.output_dir
-  vm_name        = "ubuntu24-base-image.qcow2"
+  vm_name        = "ubuntu24-base-image-${formatdate("YYYYMMDD", timestamp())}.qcow2"
   iso_url        = "https://old-releases.ubuntu.com/releases/24.04.2/ubuntu-24.04.2-live-server-amd64.iso"
   iso_checksum   = "md5:d0013676be5d53a9a160abd3ca1f762f"
   http_directory = "http"

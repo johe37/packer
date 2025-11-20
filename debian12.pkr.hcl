@@ -1,6 +1,6 @@
 source "qemu" "debian12" {
   output_directory = var.output_dir
-  vm_name        = "debian12-base-image.qcow2"
+  vm_name        = "debian12-base-image-${formatdate("YYYYMMDD", timestamp())}.qcow2"
   iso_url        = "https://cdimage.debian.org/cdimage/archive/12.12.0/amd64/iso-cd/debian-12.12.0-amd64-netinst.iso"
   iso_checksum   = "sha512:c93055182057dd19a334260671c7e10880541b7721ad9c8df87be47e0a11d5bbf85018350ff224ff6a5f6a68320b07e95d539cef9dc020c93966bfaa86d4b2ce"
   http_directory = "http"
