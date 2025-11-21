@@ -1,8 +1,14 @@
+locals {
+  al9_vm_name = "almalinux9-base-image-${formatdate("YYYYMMDD", timestamp())}"
+  al9_output_dir = "output/${local.al9_vm_name}"
+  al9_format = "qcow2"
+}
+
 source "qemu" "almalinux9" {
-  output_directory = var.output_dir
-  vm_name        = "almalinux9-base-image-${formatdate("YYYYMMDD", timestamp())}.qcow2"
-  iso_url        = "https://raw.repo.almalinux.org/almalinux/9/isos/x86_64/AlmaLinux-9.6-x86_64-boot.iso"
-  iso_checksum   = "sha256:113521ec7f28aa4ab71ba4e5896719da69a0cc46cf341c4ebbd215877214f661"
+  output_directory = local.al9_output_dir
+  vm_name        = "${local.al9_vm_name}.${local.al9_format}"
+  iso_url        = var.al9_iso_url
+  iso_checksum   = var.al9_iso_checksum
   http_directory = "http"
   boot_wait      = "10s"
   boot_command = [
@@ -19,7 +25,7 @@ source "qemu" "almalinux9" {
   disk_discard       = "unmap"
   disk_detect_zeroes = "unmap"
   disk_compression   = true
-  format             = "qcow2"
+  format             = local.al9_format
   net_device         = "virtio-net"
   vnc_bind_address   = "0.0.0.0"
   vnc_port_min       = "5900"
@@ -41,5 +47,20 @@ build {
     playbook_file    = "./ansible/provision-image-rhel.yml"
     ansible_env_vars = var.ansible_env_vars
   }
-}
 
+  provisioner "ansible" {
+    playbook_file    = "./ansible/gather-metadata.yml"
+    ansible_env_vars = var.ansible_env_vars
+  }
+
+  provisioner "file" {
+    source      = "/tmp/metadata.json"
+    destination = "${local.al9_output_dir}/metadata.json"
+    direction   = "download"
+  }
+
+  provisioner "ansible" {
+    playbook_file    = "./ansible/cleanup-rhel.yml"
+    ansible_env_vars = var.ansible_env_vars
+  }
+}

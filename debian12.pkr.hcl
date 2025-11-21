@@ -1,8 +1,14 @@
+locals {
+  debian12_vm_name = "debian12-base-image-${formatdate("YYYYMMDD", timestamp())}"
+  debian12_output_dir = "output/${local.debian12_vm_name}"
+  debian12_format = "qcow2"
+}
+
 source "qemu" "debian12" {
-  output_directory = var.output_dir
-  vm_name        = "debian12-base-image-${formatdate("YYYYMMDD", timestamp())}.qcow2"
-  iso_url        = "https://cdimage.debian.org/cdimage/archive/12.12.0/amd64/iso-cd/debian-12.12.0-amd64-netinst.iso"
-  iso_checksum   = "sha512:c93055182057dd19a334260671c7e10880541b7721ad9c8df87be47e0a11d5bbf85018350ff224ff6a5f6a68320b07e95d539cef9dc020c93966bfaa86d4b2ce"
+  output_directory = local.debian12_output_dir
+  vm_name        = "${local.debian12_vm_name}.${local.debian12_format}"
+  iso_url        = var.debian12_iso_url
+  iso_checksum   = var.debian12_iso_checksum
   http_directory = "http"
   boot_wait      = "10s"
   boot_command = [
@@ -14,7 +20,7 @@ source "qemu" "debian12" {
   disk_cache       = "none"
   disk_discard     = "unmap"
   disk_compression = true
-  format           = "qcow2"
+  format           = local.debian12_format
   net_device       = "virtio-net"
   qemuargs = [
     ["-m", "2048M"],
@@ -39,5 +45,20 @@ build {
     playbook_file    = "./ansible/provision-image-debian.yml"
     ansible_env_vars = var.ansible_env_vars
   }
-}
 
+  provisioner "ansible" {
+    playbook_file    = "./ansible/gather-metadata.yml"
+    ansible_env_vars = var.ansible_env_vars
+  }
+
+  provisioner "file" {
+    source      = "/tmp/metadata.json"
+    destination = "${local.debian12_output_dir}/metadata.json"
+    direction   = "download"
+  }
+
+  provisioner "ansible" {
+    playbook_file    = "./ansible/cleanup-debian.yml"
+    ansible_env_vars = var.ansible_env_vars
+  }
+}

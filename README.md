@@ -28,10 +28,21 @@ Or, run packer with sudo (not recommended).
 ```shell
 # Build all
 packer init .
-packer build .
+packer build -on-error=ask .
 
 # Build specific
-packer build -only=qemu.debian12 .
+packer build -on-error=ask -only=qemu.debian12 .
+
+# Build with hellnet specific vars
+packer build -on-error=ask -only=qemu.almalinux9 -var-file=hellnet.pkrvars.hcl .
+```
+
+## Upload built images
+
+Example run:
+
+```shell
+TARGET=srv1.lan.hellnet.se:/zfs_mirror01/images bash scripts/upload
 ```
 
 ### Setup noVNC example

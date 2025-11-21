@@ -1,0 +1,2 @@
+[default]
+localhost ansible_user=johe ansible_ssh_pass="jag gillar att snusa" ansible_ssh_common_args='-o StrictHostKeyChecking=no'

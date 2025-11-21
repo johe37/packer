@@ -1,8 +1,14 @@
+locals {
+  ubuntu24_vm_name = "ubuntu24-base-image-${formatdate("YYYYMMDD", timestamp())}"
+  ubuntu24_output_dir = "output/${local.ubuntu24_vm_name}"
+  ubuntu24_format = "qcow2"
+}
+
 source "qemu" "ubuntu24" {
-  output_directory = var.output_dir
-  vm_name        = "ubuntu24-base-image-${formatdate("YYYYMMDD", timestamp())}.qcow2"
-  iso_url        = "https://old-releases.ubuntu.com/releases/24.04.2/ubuntu-24.04.2-live-server-amd64.iso"
-  iso_checksum   = "md5:d0013676be5d53a9a160abd3ca1f762f"
+  output_directory = local.ubuntu24_output_dir
+  vm_name        = "${local.ubuntu24_vm_name}.${local.ubuntu24_format}"
+  iso_url        = var.ubuntu24_iso_url
+  iso_checksum   = var.ubuntu24_iso_checksum
   http_directory = "http"
   boot_wait      = "10s"
   boot_command = [
@@ -19,7 +25,7 @@ source "qemu" "ubuntu24" {
   disk_cache       = "none"
   disk_discard     = "unmap"
   disk_compression = true
-  format           = "qcow2"
+  format           = local.ubuntu24_format
   net_device       = "virtio-net"
   qemuargs = [
     ["-m", "2048M"],
@@ -44,5 +50,20 @@ build {
     playbook_file    = "./ansible/provision-image-debian.yml"
     ansible_env_vars = var.ansible_env_vars
   }
-}
 
+  provisioner "ansible" {
+    playbook_file    = "./ansible/gather-metadata.yml"
+    ansible_env_vars = var.ansible_env_vars
+  }
+
+  provisioner "file" {
+    source      = "/tmp/metadata.json"
+    destination = "${local.ubuntu24_output_dir}/metadata.json"
+    direction   = "download"
+  }
+
+  provisioner "ansible" {
+    playbook_file    = "./ansible/cleanup-debian.yml"
+    ansible_env_vars = var.ansible_env_vars
+  }
+}
