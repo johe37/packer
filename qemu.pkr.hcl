@@ -46,6 +46,16 @@ variable "debian12_iso_checksum" {
   default = "sha512:c93055182057dd19a334260671c7e10880541b7721ad9c8df87be47e0a11d5bbf85018350ff224ff6a5f6a68320b07e95d539cef9dc020c93966bfaa86d4b2ce"
 }
 
+# Debian 13
+variable "debian13_iso_url" {
+  type = string
+  default = "https://cdimage.debian.org/cdimage/archive/13.1.0/amd64/iso-cd/debian-13.1.0-amd64-netinst.iso"
+}
+variable "debian13_iso_checksum" {
+  type = string
+  default = "sha256:658b28e209b578fe788ec5867deebae57b6aac5fce3692bbb116bab9c65568b3"
+}
+
 # Ubuntu 24
 variable "ubuntu24_iso_url" {
   type = string

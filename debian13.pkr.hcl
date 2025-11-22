@@ -1,0 +1,64 @@
+locals {
+  debian13_vm_name = "debian13-base-image-${formatdate("YYYYMMDD", timestamp())}"
+  debian13_output_dir = "output/${local.debian13_vm_name}"
+  debian13_format = "qcow2"
+}
+
+source "qemu" "debian13" {
+  output_directory = local.debian13_output_dir
+  vm_name        = "${local.debian13_vm_name}.${local.debian12_format}"
+  iso_url        = var.debian13_iso_url
+  iso_checksum   = var.debian13_iso_checksum
+  http_directory = "http"
+  boot_wait      = "10s"
+  boot_command = [
+    "<esc><wait>auto url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg<enter>"
+  ]
+  accelerator      = "kvm"
+  disk_interface   = "virtio-scsi"
+  disk_size        = "10G"
+  disk_cache       = "none"
+  disk_discard     = "unmap"
+  disk_compression = true
+  format           = local.debian13_format
+  net_device       = "virtio-net"
+  qemuargs = [
+    ["-m", "2048M"],
+    ["-smp", "2"],
+    ["-cpu", "host"]
+  ]
+  ssh_username     = "root"
+  ssh_password     = "changeme"
+  ssh_timeout      = "30m"
+  headless         = true
+  vnc_bind_address = "0.0.0.0"
+  vnc_port_min     = "5900"
+  vnc_port_max     = "5910"
+}
+
+build {
+  sources = [
+    "qemu.debian13",
+  ]
+
+  provisioner "ansible" {
+    playbook_file    = "./ansible/provision-image-debian.yml"
+    ansible_env_vars = var.ansible_env_vars
+  }
+
+  provisioner "ansible" {
+    playbook_file    = "./ansible/gather-metadata.yml"
+    ansible_env_vars = var.ansible_env_vars
+  }
+
+  provisioner "file" {
+    source      = "/tmp/metadata.json"
+    destination = "${local.debian13_output_dir}/metadata.json"
+    direction   = "download"
+  }
+
+  provisioner "ansible" {
+    playbook_file    = "./ansible/cleanup-debian.yml"
+    ansible_env_vars = var.ansible_env_vars
+  }
+}
