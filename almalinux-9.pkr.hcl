@@ -1,10 +1,10 @@
 locals {
-  al9_vm_name = "almalinux9-base-image-${formatdate("YYYYMMDD", timestamp())}"
+  al9_vm_name = "almalinux-9-base-image-${formatdate("YYYYMMDD", timestamp())}"
   al9_output_dir = "output/${local.al9_vm_name}"
   al9_format = "qcow2"
 }
 
-source "qemu" "almalinux9" {
+source "qemu" "almalinux-9" {
   output_directory = local.al9_output_dir
   vm_name        = "${local.al9_vm_name}.${local.al9_format}"
   iso_url        = var.al9_iso_url
@@ -40,7 +40,7 @@ source "qemu" "almalinux9" {
 
 build {
   sources = [
-    "qemu.almalinux9",
+    "qemu.almalinux-9",
   ]
 
   provisioner "ansible" {

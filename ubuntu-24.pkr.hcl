@@ -1,18 +1,23 @@
 locals {
-  debian12_vm_name = "debian12-base-image-${formatdate("YYYYMMDD", timestamp())}"
-  debian12_output_dir = "output/${local.debian12_vm_name}"
-  debian12_format = "qcow2"
+  ubuntu24_vm_name = "ubuntu-24-base-image-${formatdate("YYYYMMDD", timestamp())}"
+  ubuntu24_output_dir = "output/${local.ubuntu24_vm_name}"
+  ubuntu24_format = "qcow2"
 }
 
-source "qemu" "debian12" {
-  output_directory = local.debian12_output_dir
-  vm_name        = "${local.debian12_vm_name}.${local.debian12_format}"
-  iso_url        = var.debian12_iso_url
-  iso_checksum   = var.debian12_iso_checksum
+source "qemu" "ubuntu-24" {
+  output_directory = local.ubuntu24_output_dir
+  vm_name        = "${local.ubuntu24_vm_name}.${local.ubuntu24_format}"
+  iso_url        = var.ubuntu24_iso_url
+  iso_checksum   = var.ubuntu24_iso_checksum
   http_directory = "http"
   boot_wait      = "10s"
   boot_command = [
-    "<esc><wait>auto url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg<enter>"
+    "<esc><wait>",
+    "e<wait>",
+    "<down><down><down><end>",
+    "<bs><bs><bs><bs><wait>",
+    "autoinstall ds=nocloud-net\\;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ ---<wait>",
+    "<f10><wait>"
   ]
   accelerator      = "kvm"
   disk_interface   = "virtio-scsi"
@@ -20,7 +25,7 @@ source "qemu" "debian12" {
   disk_cache       = "none"
   disk_discard     = "unmap"
   disk_compression = true
-  format           = local.debian12_format
+  format           = local.ubuntu24_format
   net_device       = "virtio-net"
   qemuargs = [
     ["-m", "2048M"],
@@ -38,7 +43,7 @@ source "qemu" "debian12" {
 
 build {
   sources = [
-    "qemu.debian12",
+    "qemu.ubuntu-24",
   ]
 
   provisioner "ansible" {
@@ -53,7 +58,7 @@ build {
 
   provisioner "file" {
     source      = "/tmp/metadata.json"
-    destination = "${local.debian12_output_dir}/metadata.json"
+    destination = "${local.ubuntu24_output_dir}/metadata.json"
     direction   = "download"
   }
 

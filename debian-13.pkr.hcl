@@ -1,10 +1,10 @@
 locals {
-  debian13_vm_name = "debian13-base-image-${formatdate("YYYYMMDD", timestamp())}"
+  debian13_vm_name = "debian-13-base-image-${formatdate("YYYYMMDD", timestamp())}"
   debian13_output_dir = "output/${local.debian13_vm_name}"
   debian13_format = "qcow2"
 }
 
-source "qemu" "debian13" {
+source "qemu" "debian-13" {
   output_directory = local.debian13_output_dir
   vm_name        = "${local.debian13_vm_name}.${local.debian12_format}"
   iso_url        = var.debian13_iso_url
@@ -38,7 +38,7 @@ source "qemu" "debian13" {
 
 build {
   sources = [
-    "qemu.debian13",
+    "qemu.debian-13",
   ]
 
   provisioner "ansible" {

@@ -31,13 +31,13 @@ packer init .
 packer build -on-error=ask .
 
 # Build specific
-packer build -on-error=ask -only=qemu.debian12 .
+packer build -on-error=ask -only=qemu.debian-12 .
 
 # Build with hellnet specific vars
-packer build -on-error=ask -only=qemu.almalinux9 -var-file=hellnet.pkrvars.hcl .
+packer build -on-error=ask -only=qemu.almalinux-9 -var-file=hellnet.pkrvars.hcl .
 ```
 
-## Upload built images
+### Upload built images
 
 Example run:
 
