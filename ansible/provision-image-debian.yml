@@ -29,9 +29,10 @@
         enabled: true
       with_items:
         - cloud-config
-        - cloud-init
+        - cloud-init # Debian 13 does not have this
         - cloud-init-local
         - cloud-final
+      failed_when: false
 
     - name: Disable firstboot
       ansible.builtin.lineinfile:
